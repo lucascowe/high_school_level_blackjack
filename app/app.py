@@ -1,13 +1,36 @@
 from flask import Flask, jsonify, request
-from deck import Deck
+from service.deck import Deck
+from service.user import User
+import os
+import json
 
 app = Flask(__name__)
+
+# Ensure data folder exists
+if not os.path.exists('./data'):
+    os.makedirs('./data')
+
+# Ensure users.json exists
+if not os.path.exists('./data/users.json'):
+    with open('./data/users.json', 'w') as file:
+        json.dump({}, file)
 
 deck = Deck()
 deck.shuffle()
 
 player_hand = []
 dealer_hand = []
+
+
+@app.route('/join', methods=['POST'])
+def join_game():
+    name = request.json.get('name')
+    user = User.load(name)
+    if not user:
+        user = User(name)
+        user.save()
+    return jsonify(name=user.name, chips=user.chips, highest_amount=user.highest_amount)
+
 
 @app.route('/start', methods=['GET'])
 def start_game():
