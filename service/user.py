@@ -6,23 +6,23 @@ class User:
     This class represents a user in a game.
     """
 
-    def __init__(self, name: str, chips: int = 1000):
+    def __init__(self, name: str, chips: int = 1000) -> None:
         self.name = name
         self.chips = chips
         self.highest_amount = chips
 
-    def bet(self, amount: int):
+    def bet(self, amount: int) -> bool:
         if amount <= self.chips:
             self.chips -= amount
             return True
         return False
 
-    def win(self, amount: int):
+    def win(self, amount: int) -> None:
         self.chips += amount
         if self.chips > self.highest_amount:
             self.highest_amount = self.chips
 
-    def save(self):
+    def save(self) -> None:
         with open("./data/users.json", "r+") as file:
             users = json.load(file)
             users[self.name] = {
