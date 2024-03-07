@@ -4,7 +4,7 @@ from app import app, deck, player_hand, dealer_hand
 
 class FlaskAppTest(TestCase):
 
-    def create_app(self):
+    def create_app(self) -> 'FlaskApp':
         app.config['TESTING'] = True
         return app
 
