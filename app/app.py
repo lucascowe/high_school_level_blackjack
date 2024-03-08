@@ -24,6 +24,15 @@ dealer_hand = []
 
 @app.route('/join', methods=['POST'])
 def join_game():
+    """
+    Join an existing game or create a new user.
+    This endpoint handles creating a new user or loading an existing user.
+    Args:
+        name (str): The name of the user.
+    Returns:
+        jsonify: A JSON response with the user's name, chips, and
+        highest_amount.
+    """
     name = request.json.get('name')
     user = User.load(name)
     if not user:
@@ -34,6 +43,13 @@ def join_game():
 
 @app.route('/start', methods=['GET'])
 def start_game():
+    """
+    Start a new game.
+    This endpoint handles starting a new game and initializing the player's
+    and dealer's hands.
+    Returns:
+        jsonify: A JSON response with the player's and dealer's hands.
+    """
     global player_hand, dealer_hand, deck
 
     player_hand = [deck.draw(), deck.draw()]
@@ -43,6 +59,13 @@ def start_game():
 
 @app.route('/hit', methods=['GET'])
 def hit():
+    """
+    Draw a new card for the player.
+    This endpoint handles drawing a new card for the player and checking if
+    the player has busted.
+    Returns:
+        jsonify: A JSON response with the player's hand.
+    """
     global player_hand
     player_hand.append(deck.draw())
     if calculate_total(player_hand) > 21:
@@ -51,6 +74,19 @@ def hit():
 
 @app.route('/stand', methods=['GET'])
 def stand():
+    """
+    Handler for the stand endpoint.
+    This endpoint handles the case where the player chooses to stand.
+    The dealer
+    will continue to hit until they reach at least 17. If the dealer busts,
+    the player wins. If the dealer has a higher total than the player, the
+    dealer wins. If the player has a higher total than the dealer, the player
+    wins. If both the dealer and the player have the same total, the game is a
+    tie.
+    Returns:
+        jsonify: JSON-formatted response indicating the status and the
+        dealer's hand.
+    """
     global dealer_hand
     while calculate_total(dealer_hand) < 17:
         dealer_hand.append(deck.draw())
@@ -64,6 +100,14 @@ def stand():
         return jsonify(status="It's a tie!", dealer=display_hand(dealer_hand))
 
 def long_function():
+    """
+    Prints a table of numbers and their squares up to 79.
+    This function prints a table of numbers and their squares, starting
+    from 0 and going up to 79. The output is useful for visualizing the
+    relationship between numbers and their squares in a compact format.
+    Returns:
+        None
+    """
     print(
         'Number: 0, Square: 0', 'Number: 1, Square: 1', 'Number: 2, Square: 4', 'Number: 3, Square: 9', 
         'Number: 4, Square: 16', 'Number: 5, Square: 25', 'Number: 6, Square: 36', 'Number: 7, Square: 49', 
@@ -88,6 +132,17 @@ def long_function():
     ) 
 
 def calculate_total(hand):
+    """
+    Calculate the total value of a hand in a card game.
+    This function takes a list of Card objects and calculates the total
+    value of the hand.
+    It handles aces as having a value of 1 or 11, whichever keeps the
+    total value under 21.
+    Args:
+        hand (List[Card]): A list of Card objects representing the hand.
+    Returns:
+        int: The total value of the hand.
+    """
     total = sum(card.get_value() for card in hand)
     num_aces = sum(1 for card in hand if card.value == 'A')
     while total > 21 and num_aces:
@@ -96,6 +151,19 @@ def calculate_total(hand):
     return total
 
 def display_hand(hand, hide_first=False):
+    """
+    Display the cards in a hand in a user-friendly format.
+    This function takes a list of Card objects and returns a list of
+    strings representing the cards in a user-friendly format. If hide_first is
+    True,
+    the first card in the hand will be hidden and represented as "hidden".
+    Args:
+        hand (List[Card]): A list of Card objects representing the hand.
+        hide_first (bool, optional): Whether to hide the first card in the
+            hand. Defaults to False.
+    Returns:
+        List[str]: A list of strings representing the cards in the hand.
+    """
     if hide_first:
         return ["hidden"] + [f"{card.value} of {card.suit}" for card in hand[1:]]
     return [f"{card.value} of {card.suit}" for card in hand]
