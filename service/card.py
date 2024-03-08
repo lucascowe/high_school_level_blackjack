@@ -7,6 +7,11 @@ class Card:
         self.value = value
 
     def get_value(self):
+        """
+        Return the value of the card as an integer.
+        Returns:
+            int: The value of the card.
+        """
         if self.value in ["J", "Q", "K"]:
             return 10
         if self.value == "A":
